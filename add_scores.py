@@ -1,4 +1,6 @@
 # List of all the contraceptives
+import ast
+import pandas as pd
 contraceptives = ['condoms', 'internal_condoms', 'cervical_cap', 'FAM', 
                   'arm_implant', 'copper_iud', 'hormonal_iud', 'patch', 
                   'combo_pill', 'mini_pill', 'ring', 'shot', 'sterilizatoin', 'spermicide/vaginal_cream',
@@ -101,17 +103,18 @@ def med_cond_score(a, b):
 method_experience = {}
 
 # This function takes user input and applies the scores to the arrays
-def get_user_input():
-    print("\nMethod History")
+def get_user_input(array_csv):
     method_index = 0
     
     method_experience = {}
     for method in contraceptives:
-        print(f"\n{method}")
-        used = input("Have you used this method? (Yes/No): ").lower()
+        if method in array_csv[0]:
+            used = 'yes'
+        else:
+            used = 'no'
         if used == "yes":
-            experience = input("How was your experience with this method? (-8 Negative, 0 Neutral, 8 Positive): ").lower()
-            consider_again = input("Would you consider using this method again? (-100 No, 3 Yes, 0 I don't know): ").lower()
+            experience = array_csv[1]
+            consider_again = array_csv[2]  
             method_experience[method] = {"used": used, "experience": experience, "consider_again": consider_again}
             if experience == "negative":
                 method_data_1[method_index][1] = method_data[method_index][1] * -8
@@ -133,7 +136,6 @@ def get_user_input():
             method_data_1[method_index][2] = method_data[method_index][2] * 0
         method_index += 1
 
-    print("\nPersonal Preferences")
     preferences = ["Cost Effectiveness", "Pregnancy Prevention", "Management of Period and Side Effects",
                    "Low Chance of Weight Gain/Loss", "Maintenance of Birth Control", 
                    "Partner's Willingness to Participate in Contraception"]
@@ -142,7 +144,7 @@ def get_user_input():
 
     for preference in preferences:
         if preference == "Cost Effectiveness":
-            ceff_ans = input("How much cost effectiveness is important to you('v.unp','unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp'): ")
+            ceff_ans = array_csv[3]
             if ceff_ans == "v_unp":
                 apply_score(3, -3)
             elif ceff_ans == "unp":
@@ -159,7 +161,7 @@ def get_user_input():
                 apply_score(3, 3)
         
         elif preference == "Pregnancy Prevention":
-            pp_ans = input("How important is pregnancy prevention to you('v_unp', 'unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp'): ")
+            pp_ans = array_csv[4] 
             if pp_ans == "v_unp":
                 apply_score(4, -3)
             elif pp_ans == "unp":
@@ -176,7 +178,7 @@ def get_user_input():
                 apply_score(4, 3)
     
         elif preference == "Management of Period and Side Effects":
-            mpse_ans = input("How important is managing period and side effects to you('v_unp', 'unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp'): ")
+            mpse_ans = array_csv[5] 
             if mpse_ans == "v_unp":
                 apply_score(5, -3)
             elif mpse_ans == "unp":
@@ -193,7 +195,7 @@ def get_user_input():
                 apply_score(5, 3)
     
         elif preference == "Low Chance of Weight Gain/Loss":
-            lwgl_ans = input("How important is low chance of weight gain/loss to you('v_unp', 'unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp'): ")
+            lwgl_ans = array_csv[6]
             if lwgl_ans == "v_unp":
                 apply_score(6, -3)
             elif lwgl_ans == "unp":
@@ -210,7 +212,7 @@ def get_user_input():
                 apply_score(6, 3) 
             
         elif preference == "Maintenance of Birth Control":
-            mbc_ans = input("How often do you wish to spend time on maintenance of your birth control(['daily', 'weekly', 'monthly', 'yearly'])")
+            mbc_ans = array_csv[7]
             if mbc_ans == 'daily':
                 method_data_1[0][7] = 3
 
@@ -245,7 +247,7 @@ def get_user_input():
                 method_data_1[6][7] = 3
         
         elif preference == "Partner's Willingness to Participate in Contraception":
-            pwpc_ans = input("How important is your partner's willingness to participate in contraception to you('v_unp', 'unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp'): ")
+            pwpc_ans = array_csv[8]
             if pwpc_ans == "v_unp":
                 apply_score(8, -3)
             elif pwpc_ans == "unp":
@@ -266,7 +268,6 @@ def get_user_input():
         else:
             pass
 
-    print("\nMedical Preferences")
     medical_preferences = ["STI Prevention", "Hormones Used", "Willing to Insert Foreign Object Into Vagina",
                            "Willing to Seek Consultation by a Medical Professional", 
                            "Willing to Undergo a Medical Procedure"]
@@ -274,7 +275,7 @@ def get_user_input():
     medical_pref = {}
     for preference in medical_preferences:
         if preference == "STI Prevention":
-            sti_ans = input(f"How important is STI Prevention to you('v_unp', 'unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp'): ")
+            sti_ans = array_csv[9]
             if sti_ans == "v_unp":
                 apply_score(9, -3)
             elif sti_ans == "unp":
@@ -290,7 +291,7 @@ def get_user_input():
             else:
                 apply_score(9, 3)
         elif preference == "Hormones Used":
-            horm_ans = input(f"Which hormones would you be willing to use ('none', 'progestin', 'estrogen_and_or_progestin'): ")
+            horm_ans = array_csv[10]
             value = None
             if horm_ans == 'estrogen_and_or_progestin':
                 value = 4
@@ -320,7 +321,7 @@ def get_user_input():
                 i += 1
 
         elif preference == "Willing to Insert Foreign Object Into Vagina":
-            insert_vag_ans = input("How willing are you to insert foreign object into vagina('v_unp', 'unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp')")
+            insert_vag_ans = array_csv[11]
             if insert_vag_ans == "v_unp":
                 apply_score(12, -3)
             elif insert_vag_ans == "unp":
@@ -336,7 +337,7 @@ def get_user_input():
             else:
                 apply_score(12, 3)
         elif preference == "Willing to Seek Consultation by a Medical Professional":
-            med_prof_ans = input("How willing are you to seek consultation by a medical professional('v_unp', 'unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp') ")
+            med_prof_ans = array_csv[12]
             if med_prof_ans == "v_unp":
                 apply_score(13, -3)
             elif med_prof_ans == "unp":
@@ -352,7 +353,7 @@ def get_user_input():
             else:
                 apply_score(13, 3)
         elif preference ==  "Willing to Undergo a Medical Procedure":
-            med_proc_ans = input("How willing are you to undergo a medical procedure('v_unp', 'unp', 'sl_unp', 'neutral', 'sl_imp', 'imp', 'v_imp') ")
+            med_proc_ans = array_csv[13]
             if med_proc_ans == "v_unp":
                 apply_score(14, -3)
             elif med_proc_ans == "unp":
@@ -375,15 +376,17 @@ def get_user_input():
                      # 'bottom_gender_dysphoria_periods', 'bottom_gender_dysphoria_vaginal_insertion',
                      # 'gender_dysphoria_pregnancy'] 
    
-    anxiety_exists = False
-    depression_exists = False
+    anxiety_exists = None
+    depression_exists = None
     for condition in medical_conditions:
-        print(condition)
         
-        condition_exists = input(f"Do you have {condition} (yes or no): ")
+        if condition in array_csv[14] or condition in array_csv[16]:
+            condition_exists = "yes"
+        else:
+            condition_exists = "no"
         if condition_exists == "yes":
             if condition == "acne":
-                condition_sev = input("How severe is this condition (mild/moderate/severe): ")
+                condition_sev = array_csv[15]
                 if condition_sev == 'mild':
                     med_cond_score(15, 15)
                 elif condition_sev == 'moderate':
@@ -392,7 +395,7 @@ def get_user_input():
                     med_cond_score(15, 50)
             elif condition == "anxiety":
                 anxiety_exists = True
-                condition_sev = input("How severe is this condition (mild/moderate/severe): ")
+                condition_sev = array_csv[15]
                 if condition_sev == 'mild':
                     med_cond_score(16, 15)
                 elif condition_sev == 'moderate':
@@ -401,7 +404,7 @@ def get_user_input():
                     med_cond_score(16, 50)
             elif condition == "depression":
                 depression_exists = True
-                condition_sev = input("How severe is this condition (mild/moderate/severe): ")
+                condition_sev = array_csv[15]
                 if condition_sev == 'mild':
                     med_cond_score(17, 15)
                 elif condition_sev == 'moderate':
@@ -427,7 +430,7 @@ def get_user_input():
                 med_cond_score(25, 100)
 
             elif condition == "top_gender_dysphoria":
-                condition_sev = input("How severe is this condition (mild/moderate/severe): ")
+                condition_sev = array_csv[15]
                 if condition_sev == 'mild':
                     med_cond_score(26, 15)
                 elif condition_sev == 'moderate':
@@ -438,7 +441,7 @@ def get_user_input():
             elif condition == "top_surgery":
                 med_cond_score(27, 100)
             elif condition == "bottom_gender_dysphoria_periods":
-                condition_sev = input("How severe is this condition (mild/moderate/severe): ")
+                condition_sev = array_csv[15]
                 if condition_sev == 'mild':
                     med_cond_score(28, 15)
                 elif condition_sev == 'moderate':
@@ -446,7 +449,7 @@ def get_user_input():
                 else:
                     med_cond_score(28, 50)
             elif condition == "bottom_gender_dysphoria_vaginal_insertion":
-                condition_sev = input("How severe is this condition (mild/moderate/severe): ")
+                condition_sev = array_csv[15]
                 if condition_sev == 'mild':
                     med_cond_score(29, 15)
                 elif condition_sev == 'moderate':
@@ -454,7 +457,7 @@ def get_user_input():
                 else:
                     med_cond_score(29, 50)
             elif condition == "gender_dysphoria_pregnancy":
-                condition_sev = input("How severe is this condition (mild/moderate/severe): ")
+                condition_sev = array_csv[15]
                 if condition_sev == 'mild':
                     med_cond_score(30, 15)
                 elif condition_sev == 'moderate':
@@ -517,8 +520,14 @@ def get_user_input():
 
 
 
+df = pd.read_csv('contraceptive_combinations.csv', header=None)
+
+# Store each column in a variable
+column1 = df.iloc[0].to_list()
+print(column1)
 # Getting user input
-get_user_input()
+arr = column1
+get_user_input(arr)
 #print(method_data_1)
 
 # Summing up all the values in the array and adding the data to an array named sums
@@ -533,7 +542,7 @@ for contraceptive in method_data_1:
 # Sorting the final scores in reverse order
 sums.sort(key=lambda x:x[1], reverse=True)
 
-print(method_data_1)
+# print(method_data_1)
 # Printing out the results
 for i in sums:
     print(i)
